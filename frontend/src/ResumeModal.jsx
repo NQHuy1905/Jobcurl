@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
+import Modal from "./Modal.jsx";
 
 export default function ResumeModal({ resume, onClose, onChanged }) {
   const [text, setText] = useState(resume?.text || "");
@@ -47,41 +49,44 @@ export default function ResumeModal({ resume, onClose, onChanged }) {
   }
 
   return (
-    <div className="backdrop" onClick={onClose}>
-      <div className="modal wide" onClick={(e) => e.stopPropagation()}>
-        <h2>My resume</h2>
-        <p className="muted small">
-          Kept in memory only while the app is running — never saved to the database. Replacing or removing it clears
-          all match results.
+    <Modal title="My resume" onClose={onClose} wide>
+      <p className="muted small">
+        Kept in memory only while the app is running and never saved to the database. Replacing or removing it clears
+        all match results.
+      </p>
+
+      <label htmlFor="resume-file">
+        <Icon name="file" size={14} /> Upload a PDF, TXT or MD file
+      </label>
+      <input id="resume-file" type="file" accept=".pdf,.txt,.md" onChange={pickFile} disabled={busy} />
+      <p className="hint">The text is extracted so you can review and edit it below.</p>
+
+      <label htmlFor="resume-text">Resume text</label>
+      <textarea
+        id="resume-text"
+        rows={14}
+        placeholder="Or paste your resume text here"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      {error && (
+        <p className="error" role="alert">
+          {error}
         </p>
-        <label>
-          Upload PDF / TXT / MD <span className="muted">(text is extracted so you can review it below)</span>
-          <input type="file" accept=".pdf,.txt,.md" onChange={pickFile} disabled={busy} />
-        </label>
-        <label>
-          Resume text
-          <textarea
-            rows={14}
-            placeholder="…or paste your resume text here"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <div className="row end">
-          {resume?.has_resume && (
-            <button type="button" className="ghost danger" disabled={busy} onClick={remove}>
-              Remove
-            </button>
-          )}
-          <button type="button" className="ghost" onClick={onClose}>
-            Cancel
+      )}
+      <div className="modal-actions">
+        {resume?.has_resume && (
+          <button type="button" className="btn danger push-left" disabled={busy} onClick={remove}>
+            <Icon name="trash" /> Remove
           </button>
-          <button className="primary" disabled={busy || !text.trim()} onClick={save}>
-            {busy ? "Working…" : "Save resume"}
-          </button>
-        </div>
+        )}
+        <button type="button" className="btn" onClick={onClose}>
+          Cancel
+        </button>
+        <button className="btn primary" disabled={busy || !text.trim()} onClick={save}>
+          {busy ? "Working…" : "Save resume"}
+        </button>
       </div>
-    </div>
+    </Modal>
   );
 }

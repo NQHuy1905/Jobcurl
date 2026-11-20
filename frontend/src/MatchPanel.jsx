@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./api.js";
+import Icon from "./Icon.jsx";
 
 const scoreClass = (s) => (s == null ? "none" : s >= 8 ? "high" : s >= 6 ? "mid" : "low");
+const decisionClass = (d) => (d ? `d-${d.toLowerCase().replace(/\s+/g, "-")}` : "");
 
 function List({ title, items }) {
   if (!items?.length) return null;
@@ -19,7 +21,7 @@ function List({ title, items }) {
 
 function Details({ r }) {
   return (
-    <div className="desc match-details">
+    <div className="job-body match-details">
       <p>
         <strong>Why this score:</strong> {r.score_reason}
       </p>
@@ -101,12 +103,27 @@ function Details({ r }) {
       <List title="Interview risk areas" items={r.interview_risks} />
       {r.url && (
         <p>
-          <a href={r.url} target="_blank" rel="noreferrer">
-            View posting ↗
+          <a className="site-link" href={r.url} target="_blank" rel="noreferrer">
+            View posting <Icon name="external" size={13} />
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </p>
       )}
     </div>
+  );
+}
+
+function Band({ children }) {
+  return (
+    <section className="band-dark" aria-label="Resume match">
+      <p className="eyebrow on-dark">
+        <span className="dot" /> Resume match
+      </p>
+      <h3 className="band-title">
+        Best match, <em>first.</em>
+      </h3>
+      {children}
+    </section>
   );
 }
 
@@ -130,49 +147,86 @@ export default function MatchPanel({ company, resume, token }) {
   }, [running, load]);
 
   if (!resume?.has_resume) {
-    return <p className="muted">Add your resume with the “Resume” button at the top, then click “Find match”.</p>;
+    return (
+      <Band>
+        <div className="empty-inline">
+          <Icon name="file" size={22} />
+          <p>Add your resume with the “Add resume” button at the top, then click “Find match”.</p>
+        </div>
+      </Band>
+    );
   }
   if (!run || run.status === "none") {
     return (
-      <p className="muted">
-        Click “Find match” to score your resume against the latest update ({company.job_count} positions tracked).
-        Results are kept in memory only and disappear when the app stops.
-      </p>
+      <Band>
+        <div className="empty-inline">
+          <Icon name="target" size={22} />
+          <p>
+            Click “Find match” to score your resume against this company’s latest update. Results are kept in memory
+            only and disappear when the app stops.
+          </p>
+        </div>
+      </Band>
     );
   }
 
   return (
-    <div>
-      <p className="muted small">
-        Latest update: {run.job_date} · resume: {resume.filename || "pasted text"}
+    <Band>
+      <p className="meta">
+        <span>Latest update: {run.job_date}</span>
+        <span aria-hidden="true">·</span>
+        <span>Resume: {resume.filename || "pasted text"}</span>
+        <span aria-hidden="true">·</span>
+        <span>Best match first</span>
       </p>
       {running && (
-        <div className="progress" aria-label="scoring progress">
+        <div className="progress" role="progressbar" aria-label="Scoring progress" aria-valuemin={0} aria-valuemax={run.total} aria-valuenow={run.done}>
           <div style={{ width: `${(run.done / run.total) * 100}%` }} />
           <span>
             Scoring {run.done}/{run.total}…
           </span>
         </div>
       )}
-      {run.error && <p className="banner">{run.error}</p>}
+      {run.error && (
+        <p className="banner" role="alert">
+          <Icon name="alert" /> {run.error}
+        </p>
+      )}
 
       <ul className="matches">
-        {run.results.map((r) => (
+        {run.results.map((r, idx) => (
           <li key={r.job_id}>
             <details>
               <summary>
-                <span className={`score ${scoreClass(r.score)}`}>{r.score ?? "–"}</span>
-                <span className="match-title">
-                  {r.title}
-                  {r.location && <span className="muted"> — {r.location}</span>}
+                <span className="rank" aria-label={`Rank ${idx + 1}`}>
+                  {idx + 1}
                 </span>
-                {r.decision && <span className="chip">{r.decision}</span>}
+                <span className={`score ${scoreClass(r.score)}`} aria-label={r.score == null ? "Not scored" : `Score ${r.score} out of 10`}>
+                  {r.score ?? "–"}
+                  {r.score != null && <small>/10</small>}
+                </span>
+                <span className="match-title">
+                  <span className="job-title">{r.title}</span>
+                  {r.location && (
+                    <span className="job-loc">
+                      <Icon name="pin" size={13} /> {r.location}
+                    </span>
+                  )}
+                </span>
+                {r.decision && <span className={`chip ${decisionClass(r.decision)}`}>{r.decision}</span>}
+                <Icon name="chevron" size={18} />
               </summary>
-              {r.error ? <p className="banner">Scoring failed: {r.error}</p> : <Details r={r} />}
+              {r.error ? (
+                <p className="banner" role="alert">
+                  <Icon name="alert" /> Scoring failed: {r.error}
+                </p>
+              ) : (
+                <Details r={r} />
+              )}
             </details>
           </li>
         ))}
       </ul>
-    </div>
+    </Band>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "./api.js";
+import Modal from "./Modal.jsx";
 
 export default function AddCompanyModal({ onClose, onAdded }) {
   const [url, setUrl] = useState("");
@@ -20,33 +21,46 @@ export default function AddCompanyModal({ onClose, onAdded }) {
   }
 
   return (
-    <div className="backdrop" onClick={onClose}>
-      <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
-        <h2>Add company</h2>
-        <label>
-          Company website or careers page
-          <input
-            autoFocus
-            required
-            placeholder="https://company.com/careers"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
+    <Modal title="Add a company" onClose={onClose}>
+      <form onSubmit={submit}>
+        <p className="muted small">
+          Paste the company website or its careers page. Jobcurl will scan it for current openings and start a history.
+        </p>
+        <label htmlFor="company-url">
+          Website or careers page <span className="req">*</span>
         </label>
-        <label>
+        <input
+          id="company-url"
+          required
+          placeholder="https://company.com/careers"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          aria-describedby={error ? "add-error" : undefined}
+          aria-invalid={error ? "true" : undefined}
+        />
+        <label htmlFor="company-name">
           Display name <span className="muted">(optional)</span>
-          <input placeholder="Taken from the domain if empty" value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        {error && <p className="error">{error}</p>}
-        <div className="row end">
-          <button type="button" className="ghost" onClick={onClose}>
+        <input
+          id="company-name"
+          placeholder="Taken from the domain if left empty"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        {error && (
+          <p id="add-error" className="error" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="modal-actions">
+          <button type="button" className="btn" onClick={onClose}>
             Cancel
           </button>
-          <button className="primary" disabled={busy}>
-            {busy ? "Adding…" : "Add & scan"}
+          <button className="btn primary" disabled={busy}>
+            {busy ? "Adding…" : "Add and scan"}
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

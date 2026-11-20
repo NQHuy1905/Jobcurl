@@ -6,7 +6,6 @@ Paste a company website and Jobcurl finds its open positions, keeps a per-day hi
 
 ![Jobcurl demo: add a company, see the per-day history, get the Monday digest, score your resume](docs/media/jobcurl-demo.gif)
 
-A 23-second walkthrough with made-up sample data. [Watch the MP4](docs/media/jobcurl-demo.mp4) for full quality.
 
 ## Features
 

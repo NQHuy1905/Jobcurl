@@ -2,6 +2,12 @@
 
 Paste a company website and Jobcurl finds its open positions, keeps a per-day history of newly posted roles, emails you a weekly digest, and can score your resume against the latest openings.
 
+## Demo
+
+![Jobcurl demo: add a company, see the per-day history, get the Monday digest, score your resume](docs/media/jobcurl-demo.gif)
+
+A 23-second walkthrough with made-up sample data. [Watch the MP4](docs/media/jobcurl-demo.mp4) for full quality.
+
 ## Features
 
 - **Company tabs.** Add a company by pasting its website or careers page. Each company gets its own tab.
@@ -55,7 +61,19 @@ Secrets and behaviour are in `backend/.env` (see [`backend/.env.example`](backen
 | `SCHEDULE_DAY`, `SCHEDULE_HOUR`, `SCHEDULE_MINUTE`, `SCHEDULE_TZ` | Weekly run, default Monday 09:00 machine-local time |
 | `MATCH_PROMPT_PATH` | Alternative scoring instructions file |
 
-The header has **Test email** and **Run weekly job now** buttons for checking your setup without waiting for Monday.
+The dark band at the bottom of the page has **Run weekly scan now** and **Send test email** buttons for checking your setup without waiting for Monday.
+
+## Re-render the demo video
+
+The video is a [Remotion](https://www.remotion.dev) project in [`video/`](video). Edit the scenes in `video/src/scenes/`, then:
+
+```bash
+cd video
+npm install
+npm run studio        # live preview
+npm run render:mp4    # writes docs/media/jobcurl-demo.mp4
+npm run render:gif    # converts it to docs/media/jobcurl-demo.gif (needs ffmpeg)
+```
 
 ## Limits
 

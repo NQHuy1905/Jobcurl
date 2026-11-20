@@ -6,3 +6,5 @@ frontend/node_modules/
 frontend/dist/
 .run/
 .env
+video/node_modules/
+video/out/

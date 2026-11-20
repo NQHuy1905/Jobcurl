@@ -62,17 +62,6 @@ Secrets and behaviour are in `backend/.env` (see [`backend/.env.example`](backen
 
 The dark band at the bottom of the page has **Run weekly scan now** and **Send test email** buttons for checking your setup without waiting for Monday.
 
-## Re-render the demo video
-
-The video is a [Remotion](https://www.remotion.dev) project in [`video/`](video). Edit the scenes in `video/src/scenes/`, then:
-
-```bash
-cd video
-npm install
-npm run studio        # live preview
-npm run render:mp4    # writes docs/media/jobcurl-demo.mp4
-npm run render:gif    # converts it to docs/media/jobcurl-demo.gif (needs ffmpeg)
-```
 
 ## Limits
 
